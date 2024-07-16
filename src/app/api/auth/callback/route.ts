@@ -75,9 +75,9 @@ export async function GET(req: NextRequest) {
   //Once I get the token I will delete the state cookie
   removeCookie('state')
 
-  const { access_token, email, refresh_token, expires_in } = await response.json();
+  const { access_token, email, refresh_token } = await response.json();
 
-  const cookieValue = JSON.stringify({ access_token, refresh_token, expires_in, email});
+  const cookieValue = JSON.stringify({ access_token, refresh_token, email});
 
   const res = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/profile`);
 
