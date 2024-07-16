@@ -1,13 +1,16 @@
 const authSSOServer = process.env.AUTH_SUPRA_SERVER;
+const localServer = process.env.NEXT_PUBLIC_APP_API_URL;
 
-async function verifyToken(token: string): Promise<boolean> {
+async function verifyToken(token: string, ipAddress?: string, agent?: string): Promise<boolean> {
   console.log('Verifying token:', token)
   try {
-    const response = await fetch(`${authSSOServer}/api/auth/verify-token`, {
+    const response = await fetch(`${localServer}/auth/verify-token`, {
       cache: 'no-store',
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'User-Agent': agent || '',
+        'X-Real-IP': ipAddress || '',
       }
     });
     const data = await response.json();

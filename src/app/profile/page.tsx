@@ -1,8 +1,14 @@
 import { getSession } from '@/utils/auth'
 import { fetchUserInfo, verifyToken } from '@/services/auth'
+import { headers } from 'next/headers'
 
 
 export default  async function Profile() {
+
+  const ipAddress = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'Unknown';
+  const agent = headers().get('user-agent') || 'Unknown';
+  console.log('forwardedFor: ', ipAddress)
+  console.log('User-Agent: ', agent);
 
   const session = getSession();
   const access_token = session?.access_token;
@@ -11,7 +17,7 @@ export default  async function Profile() {
   let tokenIsValid = null;
 
   if (access_token && email) {
-    tokenIsValid = await verifyToken(access_token)
+    tokenIsValid = await verifyToken(access_token, ipAddress, agent);
     console.log('tokenIsValid: ', tokenIsValid)
   }
 
