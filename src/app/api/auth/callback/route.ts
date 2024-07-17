@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(JSON.stringify({ error: 'Invalid state' }), { status: 400 });
   }
 
+
   //Request the token to the SSO Server with code and credentials
   // "grant_type": "authorization_code",
   // "client_id": "YOUR_CLIENT_ID",
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
   const client_secret = process.env.AUTH_SUPRA_CLIENT_SECRET;
   const redirect_url = process.env.NEXT_AUTH_REDIRECT_URL;
 
-  console.log('Trying to call this: ', `${process.env.AUTH_SUPRA_SERVER}/api/auth/token?code=${code}&client_id=${client_id}&redirect_uri=${redirect_url}&client_secret=${client_secret}`)
+  //console.log('Trying to call this: ', `${process.env.AUTH_SUPRA_SERVER}/api/auth/token?code=${code}&client_id=${client_id}&redirect_uri=${redirect_url}&client_secret=${client_secret}`)
 
   // const response = await fetch(`${process.env.AUTH_SSO_SERVER}/api/auth/token?code=${code}&client_id=${client_id}&redirect_uri=${redirect_url}&client_secret=${client_secret}`, {
   //   method: 'POST',
