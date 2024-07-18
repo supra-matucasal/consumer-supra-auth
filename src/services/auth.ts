@@ -7,6 +7,7 @@ async function verifyToken(token: string, ipAddress?: string, agent?: string): P
     const response = await fetch(`${localServer}/auth/verify-token`, {
       cache: 'no-store',
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Authorization': `Bearer ${token}`,
         'User-Agent': agent || '',
@@ -51,6 +52,28 @@ async function fetchUserInfo(token: string): Promise<any> {
   }
 }
 
+async function getToken(){
+  try {
+    const response = await fetch(`${localServer}/auth/token`, {
+      cache: 'no-store',
+      method: 'GET',
+      credentials: 'include',
+      // headers: {
+      //   'Authorization': `Bearer ${token}`,
+      //   'User-Agent': agent || '',
+      //   'X-Real-IP': ipAddress || '',
+      // }
+    });
+    const data = await response.json();
+    console.log('Data from getToken', data)
+
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    return false;
+  }
+}
+
 // export const refreshAccessTokenService = async (access_token: string, refresh_token: string): Promise<{access_token: string, refresh_token: string} | null> => {
   
 //   console.log('Trying to refresh token with access_token:', access_token, 'and refresh_token:', refresh_token)
@@ -87,4 +110,5 @@ async function fetchUserInfo(token: string): Promise<any> {
 export {
   verifyToken,
   fetchUserInfo,
+  getToken
 }

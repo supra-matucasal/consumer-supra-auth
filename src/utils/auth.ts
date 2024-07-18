@@ -9,6 +9,13 @@ export const getSession = (): { access_token: string, email: string } | null => 
   return { access_token, email };
 };
 
+export const getTempCode = (): string | null => {
+  const cookieValue = getCookie('tempCode');
+  const  tempCode  = cookieValue || null;
+
+  return tempCode;
+};
+
 export const getUserFromSession = async (token: string) => {
   if (!token) return null;
   return await fetchUserInfo(token);
