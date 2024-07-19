@@ -6,8 +6,8 @@ import ProfileComponent from '@/components/profile'
 
 export default async function Profile() {
 
-  const ipAddress = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'Unknown';
-  const agent = headers().get('user-agent') || 'Unknown';
+  //const ipAddress = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'Unknown';
+  //const agent = headers().get('user-agent') || 'Unknown';
   const tempCode = getTempCode();
 
   return (
