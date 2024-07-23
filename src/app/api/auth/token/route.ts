@@ -5,6 +5,11 @@ import { verifyState } from "@/utils/auth";
 
 
 export async function GET(req: NextRequest) {
+
+
+  const agent = req.headers.get('user-agent') || 'Unknown';
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown'; 
+
   const client_id = process.env.AUTH_SUPRA_CLIENT_ID;
   const client_secret = process.env.AUTH_SUPRA_CLIENT_SECRET;
   const redirect_url = process.env.NEXT_AUTH_REDIRECT_URL;
@@ -37,6 +42,8 @@ export async function GET(req: NextRequest) {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Referer': `${process.env.NEXT_PUBLIC_APP_URL}`,
+      'User-Agent': agent || '',
+      'Real-Ip': ip || '',
     },
     body: params,
     credentials: 'include',
@@ -48,7 +55,7 @@ export async function GET(req: NextRequest) {
 
   const { access_token, email, refresh_token } = await response.json();
 
-  const cookieValue = JSON.stringify({ access_token, refresh_token, email});
+  //const cookieValue = JSON.stringify({ access_token, refresh_token, email});
 
   // const res = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/profile`);
 
@@ -65,7 +72,7 @@ export async function GET(req: NextRequest) {
   const res = new NextResponse(JSON.stringify({ access_token, email, refresh_token }), { status: 200 });
   res.cookies.set({
     name: process.env.SESSION_NAME || 'session',
-    value: cookieValue,
+    value: access_token,
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     sameSite: 'lax',
@@ -75,7 +82,7 @@ export async function GET(req: NextRequest) {
 
   console.log('trying to save this cookie: ', {
     name: process.env.SESSION_NAME || 'session',
-    value: cookieValue,
+    value: access_token,
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     sameSite: 'lax',
