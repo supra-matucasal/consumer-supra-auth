@@ -1,6 +1,5 @@
 import { generateRandomState, signState } from "@/utils/auth";
 import { getCookie, setCookie } from "@/utils/cookies";
-import { customRedirect } from "@/utils/custom-redirect";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -53,9 +52,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   //     'Content-Type': 'text/html'
   //   },
   // });
-
-  
-const redirectUrl = `${process.env.AUTH_SUPRA_SERVER}/api/auth/authorize?client_id=${client_id}&redirect_uri=${redirect_url}&state=${state}`;
+  const redirectUrl = `${process.env.AUTH_SUPRA_SERVER}/api/auth/authorize?client_id=${client_id}&redirect_uri=${redirect_url}&state=${state}`;
 
   return new NextResponse(null, {
     status: 308,

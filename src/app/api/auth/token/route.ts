@@ -1,14 +1,12 @@
-import { get } from "http";
+import { getCookie } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
-import { getCookie, removeCookie, setCookie } from "@/utils/cookies";
-import { verifyState } from "@/utils/auth";
 
 
 export async function GET(req: NextRequest) {
 
 
   const agent = req.headers.get('user-agent') || 'Unknown';
-  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown'; 
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
 
   const client_id = process.env.AUTH_SUPRA_CLIENT_ID;
   const client_secret = process.env.AUTH_SUPRA_CLIENT_SECRET;
@@ -16,7 +14,7 @@ export async function GET(req: NextRequest) {
 
 
   const codeState = getCookie('tempCode');
-  console.log('current codeState: ', codeState)
+
   if (!codeState) {
     console.error('No code stored in cookies');
     // Handle missing state (CSRF or other error)
@@ -69,26 +67,29 @@ export async function GET(req: NextRequest) {
   //   maxAge: 3600,
   // });
 
-  const res = new NextResponse(JSON.stringify({ access_token, email, refresh_token }), { status: 200 });
-  res.cookies.set({
-    name: process.env.SESSION_NAME || 'session',
-    value: access_token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 3600,
-  });
 
-  console.log('trying to save this cookie: ', {
-    name: process.env.SESSION_NAME || 'session',
-    value: access_token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 3600,
-  })
-  
-  return new NextResponse(JSON.stringify({ access_token, email, refresh_token }), { status: 200 });
+  console.log("------------------------------>", access_token)
+  if (access_token) {
+    const res = new NextResponse(JSON.stringify({ access_token, email, refresh_token }), { status: 200 });
+    res.cookies.set({
+      name: process.env.SESSION_NAME || 'session',
+      value: access_token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 3600,
+    });
+
+    console.log('trying to save this cookie: ', {
+      name: process.env.SESSION_NAME || 'session',
+      value: access_token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 3600,
+    })
+    return new NextResponse(JSON.stringify({ access_token, email, refresh_token }), { status: 200 });
+  }
 }

@@ -1,6 +1,6 @@
 import { fetchUserInfo } from '@/services/auth';
-import { getCookie, setCookie } from './cookies';
 import crypto from 'crypto';
+import { getCookie, setCookie } from './cookies';
 
 export const getSession = (): { access_token: string, email: string } | null => {
   const cookieValue = getCookie(process.env.SESSION_NAME || 'session');
@@ -10,10 +10,10 @@ export const getSession = (): { access_token: string, email: string } | null => 
 };
 
 export const getTempCode = (): string | null => {
-  const cookieValue = getCookie('tempCode');
-  const  tempCode  = cookieValue || null;
+  const cookieValue = getCookie('session');
+  const session = cookieValue || null;
 
-  return tempCode;
+  return session;
 };
 
 export const getUserFromSession = async (token: string) => {
