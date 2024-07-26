@@ -60,13 +60,14 @@ export async function GET(req: NextRequest) {
     const { access_token, email, refresh_token } = await response.json();
 
     if (access_token) {
-      setCookie('session', access_token);
+      const sessionData = JSON.stringify({ access_token, email, refresh_token })
+      setCookie('session', sessionData);
 
       console.log('Access token stored in cookie');
       const res = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/profile`);
       res.cookies.set({
         name: process.env.SESSION_NAME || 'session',
-        value: access_token,
+        value: sessionData,
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
         sameSite: 'lax',

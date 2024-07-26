@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCookie } from './utils/cookies';
+import { getSession } from './utils/auth';
 
 const base64Url = (str: string) => {
   return str?.replace(/-/g, '+').replace(/_/g, '/');
@@ -17,13 +17,10 @@ const parseJwt = (token: string) => {
 };
 
 export function middleware(req: NextRequest) {
-  const token = getCookie('session');
+  const session: any = getSession();
   const redirectUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL}`);
 
-  console.log('Middleware called. Current URL:', req.nextUrl.href);
-  console.log('Token:', token);
-
-  if (!token) {
+  if (!session) {
     // Prevent redirect loop
     if (req.nextUrl.href !== redirectUrl.href) {
       console.log('No token found. Redirecting to login.');
@@ -35,12 +32,9 @@ export function middleware(req: NextRequest) {
   }
 
   try {
-    const decoded = parseJwt(token);
+    const decoded = parseJwt(session?.access_token);
     const expiry = decoded.exp;
     const currentTimestamp = Math.floor(Date.now() / 1000);
-
-    console.log('Token expiry:', expiry);
-    console.log('Current timestamp:', currentTimestamp);
 
     if (expiry < currentTimestamp) {
       console.log('Token has expired.');

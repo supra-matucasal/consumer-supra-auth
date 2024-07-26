@@ -1,5 +1,5 @@
 import ProfileComponent from '@/components/profile';
-import { getTempCode } from '@/utils/auth';
+import { getSession } from '@/utils/auth';
 import { redirect } from 'next/navigation';
 
 
@@ -7,7 +7,7 @@ export default async function Profile() {
 
   //const ipAddress = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'Unknown';
   //const agent = headers().get('user-agent') || 'Unknown';
-  const session = getTempCode();
+  const session = getSession();
   if (!session) {
     return redirect('http://127.0.0.1:8081')
   }

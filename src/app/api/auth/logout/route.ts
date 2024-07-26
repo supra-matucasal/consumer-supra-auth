@@ -1,4 +1,5 @@
-import { getCookie, removeCookie } from "@/utils/cookies";
+import { getSession } from "@/utils/auth";
+import { removeCookie } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -6,9 +7,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const redirect_logout_url = process.env.NEXT_AUTH_REDIRECT_LOGOUT_URL;
 
 
-  const access_token = getCookie('session')
+  const session = getSession();
 
-  if (!access_token || client_id === undefined || redirect_logout_url === undefined) {
+  if (!session || client_id === undefined || redirect_logout_url === undefined) {
     return NextResponse.redirect(`${process.env.AUTH_REDIRECT_LOGOUT_URL}`, { status: 302 });
   }
   const agent = req.headers.get('user-agent') || 'Unknown';
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   await fetch(`http://localhost:9000/auth/logout`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${access_token}`,
+      'Authorization': `Bearer ${session.access_token}`,
     },
   });
   // console.log('response------------->', response)

@@ -2,11 +2,16 @@ import { fetchUserInfo } from '@/services/auth';
 import crypto from 'crypto';
 import { getCookie, setCookie } from './cookies';
 
-export const getSession = (): { access_token: string, email: string } | null => {
+export const getSession = (): { access_token: string, email: string, refresh_token: string } | undefined => {
   const cookieValue = getCookie(process.env.SESSION_NAME || 'session');
-  const { access_token, email } = JSON.parse(cookieValue || '{}');
+  if (cookieValue === '') {
+    // If cookieValue is an empty object, return undefined
+    return undefined;
+  }
 
-  return { access_token, email };
+  const { access_token, email, refresh_token } = JSON.parse(cookieValue || '');
+
+  return { access_token, email, refresh_token };
 };
 
 export const getTempCode = (): string | any => {
