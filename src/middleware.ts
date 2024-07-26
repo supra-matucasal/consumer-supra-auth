@@ -23,10 +23,8 @@ export function middleware(req: NextRequest) {
   if (!session) {
     // Prevent redirect loop
     if (req.nextUrl.href !== redirectUrl.href) {
-      console.log('No token found. Redirecting to login.');
       // return NextResponse.redirect(redirectUrl);
     } else {
-      console.log('Already on the login page. No redirect to avoid loop.');
       return NextResponse.next();
     }
   }
@@ -37,30 +35,23 @@ export function middleware(req: NextRequest) {
     const currentTimestamp = Math.floor(Date.now() / 1000);
 
     if (expiry < currentTimestamp) {
-      console.log('Token has expired.');
       // Prevent redirect loop
       if (req.nextUrl.href !== redirectUrl.href) {
-        console.log('Redirecting to login due to expired token.');
         // return NextResponse.redirect(redirectUrl);
       } else {
-        console.log('Already on the login page. No redirect to avoid loop.');
         return NextResponse.next();
       }
     } else {
       console.log('Token is valid.');
     }
   } catch (error: any) {
-    console.error('Error decoding token:', error.message);
     // Prevent redirect loop
     if (req.nextUrl.href !== redirectUrl.href) {
-      console.log('Error in token. Redirecting to login.');
       // return NextResponse.redirect(redirectUrl);
     } else {
-      console.log('Already on the login page. No redirect to avoid loop.');
       return NextResponse.next();
     }
   }
 
-  console.log('Token valid or already on login page. Proceeding to next response.');
   return NextResponse.next();
 }

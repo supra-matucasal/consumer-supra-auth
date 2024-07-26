@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse(JSON.stringify({ error: 'Invalid state' }), { status: 400 });
     }
 
-    removeCookie('state');
+
 
     const agent = req.headers.get('user-agent') || 'Unknown';
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
@@ -74,6 +74,9 @@ export async function GET(req: NextRequest) {
         path: '/',
         maxAge: 3600,
       });
+
+      removeCookie('state');
+
       return res;
     }
 
