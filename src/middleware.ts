@@ -1,45 +1,72 @@
-import { NextRequest, NextResponse, userAgent } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getCookie } from './utils/cookies';
 
-const allowedOrigins = [
-  process.env.AUTH_SUPRA_SERVER,
-]
-
-export async function middleware(req: NextRequest) {
-
-  //   console.log('Req: ', req.url)
-
-  // let referer = req.headers.get('Referer');
-  // console.log('referer: ', referer)
-
-  // if (!referer) {
-  //   return NextResponse.redirect('http://supra.com');
-  // }
-  // const url = new URL(referer);
-  // const origin = url.origin;
-
-  
-  // console.log('origin: ', origin)
-  // console.log('allowedOrigins: ', allowedOrigins)
-
-  // if (origin && allowedOrigins.includes(origin)) {
-  //   const response = NextResponse.next();
-
-  //   response.headers.set('Access-Control-Allow-Origin', origin);
-  //   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  //   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With');
-  //   response.headers.set('Access-Control-Allow-Credentials', 'true');
-
-  //   if (req.method === 'OPTIONS') {
-  //     return new NextResponse(null, { headers: response.headers });
-  //   }
-
-  //   return NextResponse.next();
-  // } else {
-  //   return new NextResponse('Not allowed', { status: 403, headers: { 'Content-Type': 'text/plain' } });
-  // }
-
-}
-
-export const config = {
-  matcher: ['/api/auth/callback'],
+const base64Url = (str: string) => {
+  return str?.replace(/-/g, '+').replace(/_/g, '/');
 };
+
+const base64Decode = (str: string) => {
+  return Buffer.from(str, 'base64').toString('utf-8');
+};
+
+const parseJwt = (token: string) => {
+  const [header, payload, signature] = token?.split('.');
+
+  const decodedPayload = base64Decode(base64Url(payload));
+  return JSON.parse(decodedPayload);
+};
+
+export function middleware(req: NextRequest) {
+  const token = getCookie('session');
+  const redirectUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL}`);
+
+  console.log('Middleware called. Current URL:', req.nextUrl.href);
+  console.log('Token:', token);
+
+  if (!token) {
+    // Prevent redirect loop
+    if (req.nextUrl.href !== redirectUrl.href) {
+      console.log('No token found. Redirecting to login.');
+      // return NextResponse.redirect(redirectUrl);
+    } else {
+      console.log('Already on the login page. No redirect to avoid loop.');
+      return NextResponse.next();
+    }
+  }
+
+  try {
+    const decoded = parseJwt(token);
+    const expiry = decoded.exp;
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    console.log('Token expiry:', expiry);
+    console.log('Current timestamp:', currentTimestamp);
+
+    if (expiry < currentTimestamp) {
+      console.log('Token has expired.');
+      // Prevent redirect loop
+      if (req.nextUrl.href !== redirectUrl.href) {
+        console.log('Redirecting to login due to expired token.');
+        // return NextResponse.redirect(redirectUrl);
+      } else {
+        console.log('Already on the login page. No redirect to avoid loop.');
+        return NextResponse.next();
+      }
+    } else {
+      console.log('Token is valid.');
+    }
+  } catch (error: any) {
+    console.error('Error decoding token:', error.message);
+    // Prevent redirect loop
+    if (req.nextUrl.href !== redirectUrl.href) {
+      console.log('Error in token. Redirecting to login.');
+      // return NextResponse.redirect(redirectUrl);
+    } else {
+      console.log('Already on the login page. No redirect to avoid loop.');
+      return NextResponse.next();
+    }
+  }
+
+  console.log('Token valid or already on login page. Proceeding to next response.');
+  return NextResponse.next();
+}

@@ -1,28 +1,34 @@
-import { removeCookie, getCookie } from "@/utils/cookies";
-import { permanentRedirect } from "next/navigation";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
-
-  console.log('GET /api/auth/logout')
-
   const client_id = process.env.AUTH_SUPRA_CLIENT_ID;
   const redirect_logout_url = process.env.NEXT_AUTH_REDIRECT_LOGOUT_URL;
 
-  const cookieValue = getCookie('session')
-  const { access_token } = JSON.parse(cookieValue || '{}');
 
-
-
+  const access_token = getCookie('session')
 
   if (!access_token || client_id === undefined || redirect_logout_url === undefined) {
     return NextResponse.redirect(`${process.env.AUTH_REDIRECT_LOGOUT_URL}`, { status: 302 });
   }
-
+  const agent = req.headers.get('user-agent') || 'Unknown';
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
 
   //Remove the cookie session
   removeCookie('session')
 
+  // const response = 
+  await fetch(`http://localhost:9000/auth/logout`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${access_token}`,
+    },
+  });
+  // console.log('response------------->', response)
+  // if (response.status !== 201) {
+  //   console.error('Failed to logout');
+  //   return new NextResponse(JSON.stringify({ error: 'Failed to logout' }), { status: 400 });
+  // }
   //Logout from the SSO
   return NextResponse.redirect(`${process.env.AUTH_SUPRA_SERVER}/api/auth/logout?client_id=${client_id}&redirect_logout_url=${redirect_logout_url}`, { status: 302 });
 

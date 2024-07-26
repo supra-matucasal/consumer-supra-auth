@@ -18,7 +18,7 @@ export const setCookie = (cookieName: string, value: string, sameSite?: 'lax' | 
 };
 
 export const getCookie = (cookieName: string): string => {
-  return cookies().get(cookieName)?.value || '{}' as string;
+  return cookies().get(cookieName)?.value || '' as string;
 };
 
 

@@ -9,10 +9,14 @@ export const getSession = (): { access_token: string, email: string } | null => 
   return { access_token, email };
 };
 
-export const getTempCode = (): string | null => {
+export const getTempCode = (): string | any => {
   const cookieValue = getCookie('session');
-  const session = cookieValue || null;
+  if (cookieValue === '') {
+    // If cookieValue is an empty object, return undefined
+    return undefined;
+  }
 
+  const session = cookieValue || null;
   return session;
 };
 
