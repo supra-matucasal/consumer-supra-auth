@@ -13,7 +13,7 @@ export default async function Profile() {
   }
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-3xl font-bold">Welcome to Next.js + Directus</h1>
+      <h1 className="text-3xl font-bold">Welcome to Next.js + Directus + Consumer 2</h1>
       {session && <ProfileComponent session={session} />}
       <a href={`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/logout`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Logout
