@@ -19,19 +19,52 @@ export async function GET(req: NextRequest, res: NextResponse) {
   removeCookie('session')
 
   // const response = 
-  await fetch(`http://localhost:9000/auth/logout`, {
+  // await fetch(`http://localhost:9000/auth/logout`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Authorization': `Bearer ${session.access_token}`,
+  //   },
+  // });
+
+  console.log('Trying to logout with this: ', {
+    //'Content-Type': 'application/x-www-form-urlencoded',
+      'Referer': `${process.env.NEXT_PUBLIC_APP_URL}`,
+      'Authorization': `Bearer ${session.access_token}`,
+      'User-Agent': agent || '',
+      'Real-Ip': ip || '',
+      'redirect_logout_url': redirect_logout_url
+  })
+
+
+
+  const response = await fetch(`${process.env.AUTH_SUPRA_SERVER}/api/auth/logout`, {
     method: 'POST',
     headers: {
+      //'Content-Type': 'application/x-www-form-urlencoded',
+      'Referer': `${process.env.NEXT_PUBLIC_APP_URL}`,
       'Authorization': `Bearer ${session.access_token}`,
+      'User-Agent': agent || '',
+      'Real-Ip': ip || '',
     },
+    body: JSON.stringify({ redirectLogoutUrl: redirect_logout_url }),
+    //credentials: 'include',
   });
-  // console.log('response------------->', response)
+
+
+
+  console.log('response------------->', response)
+
+  const data = await response.json();
+  console.log('data------------->', data)
+
+  return NextResponse.redirect(redirect_logout_url)
+
   // if (response.status !== 201) {
   //   console.error('Failed to logout');
   //   return new NextResponse(JSON.stringify({ error: 'Failed to logout' }), { status: 400 });
   // }
   //Logout from the SSO
-  return NextResponse.redirect(`${process.env.AUTH_SUPRA_SERVER}/api/auth/logout?client_id=${client_id}&redirect_logout_url=${redirect_logout_url}`, { status: 302 });
+  //return NextResponse.redirect(`${process.env.AUTH_SUPRA_SERVER}/api/auth/logout?client_id=${client_id}&redirect_logout_url=${redirect_logout_url}`, { status: 302 });
 
 
   // const htmlContent = `
